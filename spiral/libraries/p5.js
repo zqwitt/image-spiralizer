@@ -9021,8 +9021,12 @@ var p5 = function(sketch, node, sync) {
       // Otherwise displays and removes user provided loading screen
       var loadingScreen = document.getElementById(this._loadingScreenId);
       if(!loadingScreen){
+        var initialCanvas = document.getElementById('defaultCanvas0');
+        initialCanvas.style.display = 'none';
         loadingScreen = document.createElement('div');
-        loadingScreen.innerHTML = 'Loading...';
+        loadingScreen.style.width = '100%';
+        loadingScreen.style.height = '100%';
+        loadingScreen.style.backgroundColor = '#291B2C';
         loadingScreen.style.position = 'absolute';
         loadingScreen.id = this._loadingScreenId;
         var node = this._userNode || document.body;
@@ -9054,8 +9058,10 @@ var p5 = function(sketch, node, sync) {
     var context = this._isGlobal ? window : this;
     if (context._preloadCount === 0) {
       var loadingScreen = document.getElementById(context._loadingScreenId);
+      var initialCanvas = document.getElementById('defaultCanvas0');
       if (loadingScreen) {
         loadingScreen.parentNode.removeChild(loadingScreen);
+        initialCanvas.style.display = 'block';
       }
       context._setup();
       context._runFrames();
