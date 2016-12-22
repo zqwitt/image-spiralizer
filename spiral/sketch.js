@@ -8,20 +8,24 @@ function preload() {
 
 function setup() {
   // Get that canvas made yo!;
-  createCanvas(windowWidth, windowHeight);
+  var c = createCanvas(windowWidth, windowHeight);
+  c.drop(gotFile);
+  drawEverything();
+}
 
+function drawEverything(){
   // We need them images to be centered and don't forget to load dem pixels
   imageMode(CENTER);
   img.loadPixels();
-  
+
   //Portrait or Landscape
   var radius;
   if(img.width >= img.height){
-    radius = img.height/2;  
+    radius = img.height/2;
   }else{
-    radius = img.width/2;  
+    radius = img.width/2;
   }
-  
+
   // SVG
   rune = new Rune({
     container: "#container",
@@ -29,20 +33,20 @@ function setup() {
     height: radius*2+50
   });
 
-  //Get container for svg and set size 
+  //Get container for svg and set size
   document.getElementById('container').style.width = radius*2+50 + 'px';
   document.getElementById('container').style.height = radius*2+50 + 'px';
-  
+
   // How many times 'round
   var coils = 50; //<----YOU MAY NEED TO ADJUST THIS NUMBER
   var thetaMax = coils * TWO_PI;
-  
-  // 
+
+  //
   var awayStep = radius / thetaMax;
   var chord = 2;
   var rotation = 360;
   var theta = chord;
-  
+
   // how bumpy you want it
   var amp = 0;
   // Move stuff to the middle of the screen
@@ -56,19 +60,18 @@ function setup() {
   runePath.stroke('#291B2C');
   runePath.strokeWidth(0.5)
   while (theta <= thetaMax) {
-    
     amp = -amp;
     var away = (awayStep * theta);
     var around = theta + rotation;
-    
+
     // Polar to Cartesian
     var x = img.width / 2 + cos(around) * (away + amp);
     var y = img.height / 2 + sin(around) * (away + amp);
 
-    //Get the brightness of the image 
+    //Get the brightness of the image
     var bri = 100 - brightness(color(img.get(x, y)));
     var r = bri / 25;
-    
+
     // Draw the spiral
     vertex(x,y);
     // runePath.lineTo(x,y);
@@ -81,7 +84,7 @@ function setup() {
     // SHHH it's totally drawn with one line (had to hack the look because P5 strokeWeight does not affect PShapes)
     ellipse(x, y, r);
     strokeWeight(0.5);
-    
+
     // KEEP GOING
     theta += chord / away
   }
@@ -89,7 +92,16 @@ function setup() {
   noFill();
   // Ooh look we have a pretty spiral!
   endShape();
-  // Draw the svg 
+  // Draw the svg
   rune.draw();
+}
 
+function gotFile(file){
+  // If it's an image file
+  if (file.type === 'image') {
+    // Create an image DOM element but don't show it
+    var tempImg = createImg(file.data).hide();
+    img
+    drawEverything();
+  }
 }
