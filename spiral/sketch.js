@@ -1,6 +1,5 @@
-
 var img;
-var rune;
+var s = 2;
 function preload() {
 
   img = loadImage("assets/hepburn.jpg"); //<--------PUT YOUR IMAGE HERE
@@ -8,13 +7,15 @@ function preload() {
 
 function setup() {
   // Get that canvas made yo!;
-  var c = createCanvas(windowWidth, windowHeight);
-  c.drop(gotFile);
+
+  var c = createCanvas(windowWidth*s, windowHeight*s);
   drawEverything();
+  //saveCanvas('image', 'png');
 }
 
 function drawEverything(){
   // We need them images to be centered and don't forget to load dem pixels
+  var total = 0;
   imageMode(CENTER);
   img.loadPixels();
 
@@ -26,39 +27,33 @@ function drawEverything(){
     radius = img.width/2;
   }
 
-  // SVG
-  rune = new Rune({
-    container: "#container",
-    width: radius*2+50,
-    height: radius*2+50
-  });
-
-  //Get container for svg and set size
-  document.getElementById('container').style.width = radius*2+50 + 'px';
-  document.getElementById('container').style.height = radius*2+50 + 'px';
-
   // How many times 'round
-  var coils = 50; //<----YOU MAY NEED TO ADJUST THIS NUMBER
+  var coils = 70; //<----YOU MAY NEED TO ADJUST THIS NUMBER
   var thetaMax = coils * TWO_PI;
 
   //
   var awayStep = radius / thetaMax;
-  var chord = 2;
+  var chord = 1;
   var rotation = 360;
   var theta = chord;
 
   // how bumpy you want it
   var amp = 0;
   // Move stuff to the middle of the screen
-  translate(width/2-img.width/2,height/2-img.height/2);
+  if(s>1){
+    translate(width/2-img.width*(s/2),height/2-img.height*(s/2));
+    scale(s);
+  }else{
+    translate(width/2-img.width/2,height/2-img.height/2);
+  }
 
   // Time to draw that spiral
+  fill('#291B2C');
+  stroke('#291B2C');
+  strokeWeight(1);
+
   beginShape();
-  var runePath = rune.path(0,0);
-  runePath.moveTo(img.width / 2 + cos(theta+rotation) * (awayStep*theta + amp),img.height / 2 + sin(theta+rotation) * (awayStep*theta + amp));
-  runePath.fill(false);
-  runePath.stroke('#291B2C');
-  runePath.strokeWidth(0.5)
+  var temp = 0;
   while (theta <= thetaMax) {
     amp = -amp;
     var away = (awayStep * theta);
@@ -70,38 +65,20 @@ function drawEverything(){
 
     //Get the brightness of the image
     var bri = 100 - brightness(color(img.get(x, y)));
-    var r = bri / 25;
+    var r = (bri / 25);
 
     // Draw the spiral
     vertex(x,y);
-    // runePath.lineTo(x,y);
-    var runeCircle = rune.circle(x,y,r/2);
-
-    fill('#291B2C');
-    stroke('#291B2C')
-    runeCircle.fill('#291B2C');
-    runeCircle.stroke('#291B2C');
     // SHHH it's totally drawn with one line (had to hack the look because P5 strokeWeight does not affect PShapes)
+    fill(color(img.get(x, y)));
     ellipse(x, y, r);
-    strokeWeight(0.5);
 
     // KEEP GOING
     theta += chord / away
+    total++;
   }
   // Don't fill the spiral
   noFill();
   // Ooh look we have a pretty spiral!
   endShape();
-  // Draw the svg
-  rune.draw();
-}
-
-function gotFile(file){
-  // If it's an image file
-  if (file.type === 'image') {
-    // Create an image DOM element but don't show it
-    var tempImg = createImg(file.data).hide();
-    img
-    drawEverything();
-  }
 }
